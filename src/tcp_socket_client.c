@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include "frozen.h"
+#include "log.h"
  
 #define PORT 12121 
 #define SA struct sockaddr 
@@ -29,11 +30,11 @@ operation_result tcp_init(){
     // socket create and varification 
     sockfd = socket(AF_INET, SOCK_STREAM, 0); 
 	if (sockfd == -1) { 
-        printf("socket creation failed...\n"); 
+        log_error("socket creation failed...\n"); 
         return socket_failure; 
     } 
     else {
-		printf("Socket successfully created..\n"); 
+		log_debug("Socket successfully created..\n"); 
 		return socket_success;
 	}
 }
@@ -47,10 +48,10 @@ operation_result tcp_connect_to_server(char*  server_ip){
   
     // connect the client socket to server socket 
     if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) { 
-        printf("connection with the server failed...\n"); 
+        log_error("connection with the server failed...\n"); 
         return socket_failure; 
     } else {
-		printf("connected to the server..\n");
+		log_debug("connected to the server..\n");
 		return socket_success;
 	}
 }
@@ -89,12 +90,12 @@ operation_result tcp_recv_data(char* data_buffer){
 
 void load_heading_integer_to_byte_array(int number,char* array){
 	//LSB first
-	printf("number: %i ", number);
+	log_trace("number: %i ", number);
 	array[0] = (unsigned char) (number & 0xFF);
 	array[1] = (unsigned char) ((number>>8) & 0xFF);
 	array[2] = (unsigned char) ((number>>16) & 0xFF);
 	array[3] = (unsigned char) ((number>>24) & 0xFF);
-	printf("bytes:%i,%i,%i,%i\n",array[0],array[1],array[2],array[3]);
+	log_trace("bytes:%i,%i,%i,%i\n",array[0],array[1],array[2],array[3]);
 
 }
 
@@ -111,11 +112,11 @@ operation_result tcp_send_rpc_request(rpc* request){
 	request->station_id,
 	request->payload_size,
 	request->payload);
-	printf("RPC req: %s\n",rpc_buf);
+	log_trace("RPC req: %s\n",rpc_buf);
 
 	load_heading_integer_to_byte_array(strlen(rpc_buf),total_buf);
 	
-	printf("TOTAL req: %c%c%c%c%s\n",total_buf[0],total_buf[1],total_buf[2],total_buf[3],&total_buf[4]);
+	log_trace("TOTAL req: %c%c%c%c%s\n",total_buf[0],total_buf[1],total_buf[2],total_buf[3],&total_buf[4]);
 
 	if(write(sockfd, total_buf, strlen(rpc_buf)+4) > 0){
 		return socket_success;
@@ -130,7 +131,7 @@ int integerFromArrayTip(char* array){
 	number = (number<<8) + (unsigned char) array[2];
 	number = (number<<8) + (unsigned char) array[1];
 	number = (number<<8) + (unsigned char) array[0];
-	printf("number:%i",number);
+	log_trace("number:%i",number);
 	return number;
 
 }
@@ -143,22 +144,24 @@ operation_result tcp_recv_rpc_response(rpc* response){
 		int size_int = integerFromArrayTip(resp_buf);
 		char* recv_data = &resp_buf[4];
 		recv_data[size_int]='\0';
-		printf("size_cadena:%lu,cadena: %s\n",strlen(recv_data),recv_data);
-		printf("HOLOOO");
+		log_trace("size_cadena:%lu,cadena: %s\n",strlen(recv_data),recv_data);
+		log_trace("HOLOOO");
 		
 		json_scanf(recv_data,strlen(recv_data),RPC_JSON_FMT,
-		&response->command_id,
-		&response->satellite_id,
-		&response->station_id,
-		&response->payload_size,
-		&response->payload);
+		& response->command_id,
+		& response->satellite_id,
+		& response->station_id,
+		& response->payload_size,
+		& response->payload);
+
+		log_trace("payload size: %lu, apy:%s", strlen(response->payload),response->payload);
 		
-		printf("cid:%i,\nsatid:%i,\nstid:%i,\nsize:%i,\npay:%lu",
+		log_trace("cid:%i,\nsatid:%i,\nstid:%i,\nsize:%lu,\npay:%s",
 		response->command_id,
 		response->satellite_id,
 		response->station_id,
 		response->payload_size,
-		strlen(response->payload));
+		response->payload);
 		
 		return socket_success;
 
@@ -166,9 +169,47 @@ operation_result tcp_recv_rpc_response(rpc* response){
 		return socket_failure;
 	}
 }
-
-
-operation_result tcp_send_file(char* file_name){}
+#define nofile "File Not Found!"
+// funtion sending file
+int load_file_buffer(FILE* fp, char* buf, int s) 
+{ 
+    int i, len; 
+    if (fp == NULL) { 
+        strcpy(buf, nofile); 
+        len = strlen(nofile); 
+        buf[len] = EOF;
+        return 1; 
+    } 
+  
+    char ch; 
+    for (i = 0; i < s; i++) { 
+        ch = fgetc(fp); 
+        buf[i] = ch; 
+        if (ch == EOF) 
+            return 1; 
+    } 
+    return 0; 
+} 
+#define NET_BUF_SIZE 32 
+operation_result tcp_send_file(char* file_name){
+	FILE *file_ptr;
+	file_ptr=fopen(file_name,"r");
+	char file_buffer[NET_BUF_SIZE]; 
+	while (1) {
+		// process 
+		if (load_file_buffer(file_ptr, file_buffer, NET_BUF_SIZE)) {
+			if(write(sockfd, file_buffer, strlen(file_buffer)) > 0);
+			break;
+		}
+		// send 
+		if(write(sockfd, file_buffer, NET_BUF_SIZE) > 0)
+		bzero(file_buffer,NET_BUF_SIZE);
+	} 
+	if (file_ptr != NULL){
+		fclose(file_ptr);
+	}
+	return socket_success;
+}
 operation_result tcp_recv_file(){}
 
 operation_result tcp_close_connection(){

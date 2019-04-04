@@ -16,6 +16,12 @@ int init_sat_service(){
     tcp_connect_to_server("sad");
 }
 
+int upgrade_firmware(char* file_name){
+    tcp_send_file("../scripts/file_server");
+}
+
+int earth_surface_scan();
+
 int get_telemetry_data(sat_telemetry* telemetry_data){
     rpc telemetry_request = {
         TELEMETY_COMMAND_CODE,
@@ -25,13 +31,14 @@ int get_telemetry_data(sat_telemetry* telemetry_data){
     rpc telemetry_response;
     tcp_send_rpc_request(&telemetry_request);
     tcp_recv_rpc_response(&telemetry_response);
+    
     json_scanf(telemetry_response.payload,telemetry_response.payload_size,
     TELEMETRY_JSON_FMT,
-    telemetry_data->cpu_usage,
-    telemetry_data->firm_version,
-    telemetry_data->mem_usage,
-    telemetry_data->satellite_id,
-    telemetry_data->uptime);
+    & telemetry_data->cpu_usage,
+    & telemetry_data->firm_version,
+    & telemetry_data->mem_usage,
+    & telemetry_data->satellite_id,
+    & telemetry_data->uptime);
     
     return 0;
 }

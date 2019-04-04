@@ -8,9 +8,10 @@
 #include "presenter.h"
 #include <stdio.h>
 //#include <ncurses.h>
+#include "log.h"
 
 void init_vista(){
-	printf("VISTA INIT\n");
+	log_debug("VISTA INIT\n");
 	//initscr();
 	init_presenter();
 }

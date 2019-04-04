@@ -12,9 +12,10 @@
 #include "satellite_service.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "log.h"
 
 void init_presenter(){
-	printf("PRESENTER INIT\n");
+	log_debug("PRESENTER INIT\n");
 	init_sat_service();
 	show_login_promt();
 }
@@ -59,11 +60,7 @@ void process_option_selection(int selected_option){
 }
 
 void start_firmware_update(char* upgrade_file_name){
-	//tcp_send_data();
-	char data[200];
-	//tcp_recv_data(data);
-	//printf("DATA: %s", data);
-	//tcp_close_connection();
+	upgrade_firmware("sadas");
 }
 
 void start_image_scanning(){
@@ -74,5 +71,5 @@ void request_sat_telemetry(){
 	sat_telemetry telemetry_data;
 	malloc(sizeof(sat_telemetry));
 	get_telemetry_data(&telemetry_data);
-	printf("mem:%i,cpu:%i",telemetry_data.mem_usage,telemetry_data.cpu_usage);
+	log_trace("mem:%i,cpu:%i",telemetry_data.mem_usage,telemetry_data.cpu_usage);
 }

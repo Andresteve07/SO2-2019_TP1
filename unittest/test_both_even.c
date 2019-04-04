@@ -6,7 +6,6 @@
 #include "modulo.h"
 #include "fff.h"
 #include "frozen.h"
-#include "vista.h"
 
 DEFINE_FFF_GLOBALS
 #define TEST_F(SUITE, NAME) void NAME()
@@ -29,13 +28,24 @@ TEST_F(ModuloTest, easy_json_test){
 
 }
 
-TEST_F(JSONTest, qfield_json_test){
-	char* str = "{ \"a\": 123, \"b\": \"{pal\":2342}\", \"c\": false }";
-	char* b;
-	int result = json_scanf(str, strlen(str), "{b: %Q}", &b);
-	printf("result:%i, b:%s\n",result, b);
-	assert(strlen(b)==12);
+TEST_F(JSONTest, print_qfield_json_test){
+	char* json_str = "{ \"a\": 123, \"c\": false }";
+	char rpc_buf[200];
+	struct json_out output = JSON_OUT_BUF(rpc_buf, 200);
+	int result = json_printf(& output, "{str:%Q}",json_str);
+	printf("print_result:%i, rpc_buf:%s\n",result, rpc_buf);
+	assert(strlen(rpc_buf)==38);
 }
+
+TEST_F(JSONTest, qfield_json_test){
+	
+	char* str = "{ \"a\": 123, \"payload\":\"{\\\"cpu_usage\\\":73.68,\\\"firmware_version\\\":12413,\\\"mem_usage\\\":45.71,\\\"satellite_id\\\":555555,\\\"uptime\\\":98.89}\", \"c\": false }";
+	char* b;
+	int result = json_scanf(str, strlen(str), "{payload: %Q}", &b);
+	printf("result:%i, b:%s\n",result, b);
+	assert(strlen(b)==99);
+}
+
 
 TEST_F(ModuloTest, both_even_numbers)
 {
@@ -168,9 +178,9 @@ TEST_F(ModuloTest, one_odd_and_other_zero)
 
 int main(void)
 {
-	//init_vista();
 	RUN_TEST(ModuloTest, easy_json_test);
 	RUN_TEST(JSONTest, qfield_json_test);
+	RUN_TEST(JSONTest, print_qfield_json_test);
 	RUN_TEST(ModuloTest, both_odd_numbers);
 	RUN_TEST(ModuloTest, both_even_numbers);
 	RUN_TEST(ModuloTest, first_even_and_second_odd);
