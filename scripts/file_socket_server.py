@@ -16,7 +16,7 @@ while True:
     print('Server received', repr(data))
 
     filename='file_server' #In the same folder or path is this file running must the file you want to tranfser to be
-    #dd if=/dev/urandom of=file_server count=128 bs=128
+    #$ dd if=/dev/urandom of=file_server count=32 bs=1024
     f = open(filename,'rb')
     l = f.read(1024)
     while (l):

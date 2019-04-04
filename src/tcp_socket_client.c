@@ -198,19 +198,24 @@ operation_result tcp_send_file(char* file_name){
 	while (1) {
 		// process 
 		if (load_file_buffer(file_ptr, file_buffer, NET_BUF_SIZE)) {
-			if(write(sockfd, file_buffer, strlen(file_buffer)) > 0);
-			break;
+			if(write(sockfd, file_buffer, strlen(file_buffer)) > 0){
+				break;
+			} else {
+				return socket_failure;
+			}
 		}
 		// send 
-		if(write(sockfd, file_buffer, NET_BUF_SIZE) > 0)
+		if(write(sockfd, file_buffer, NET_BUF_SIZE) <= 0){
+			return socket_failure;
+		}
 		bzero(file_buffer,NET_BUF_SIZE);
-	} 
+	}
 	if (file_ptr != NULL){
 		fclose(file_ptr);
 	}
 	return socket_success;
 }
-operation_result tcp_recv_file(){}
+operation_result tcp_recv_file(FILE* file_ptr){}
 
 operation_result tcp_close_connection(){
 	// close the socket 

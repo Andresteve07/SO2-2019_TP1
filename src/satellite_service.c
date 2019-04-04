@@ -4,12 +4,17 @@
 #include "frozen.h"
 
 #define TELEMETRY_JSON_FMT "{cpu_usage:%f,firmware_version:%d,mem_usage:%f,satellite_id:%d,uptime:%f}"
+#define UPDATE_COMMAND_CODE 1
+
 #define TELEMETY_COMMAND_CODE 3
+
 #define SCAN_COMMAND_CODE 2
 #define FIRMWARE_COMMAND_CODE 1
 
 #define STATION_ID 123456
 #define SATELLITE_ID 987654
+
+#define FIRMWARE_FILE_PATH "../assets/file_server"
 
 int init_sat_service(){
     tcp_init();
@@ -17,7 +22,13 @@ int init_sat_service(){
 }
 
 int upgrade_firmware(char* file_name){
-    tcp_send_file("../scripts/file_server");
+    rpc update_request = {
+        UPDATE_COMMAND_CODE,
+        STATION_ID,
+        SATELLITE_ID,
+        0,NULL};
+    tcp_send_rpc_request(& update_request);
+    tcp_send_file(FIRMWARE_FILE_PATH);
 }
 
 int earth_surface_scan();

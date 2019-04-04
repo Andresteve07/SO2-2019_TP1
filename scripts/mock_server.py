@@ -41,6 +41,8 @@ while True:
     connection, client_address = sock.accept()
     try:
         print >>sys.stderr, 'connection from', client_address
+        data = connection.recv(128)
+        print >>sys.stderr, 'received "%s"' % data
         recv_file(connection)
         
             
