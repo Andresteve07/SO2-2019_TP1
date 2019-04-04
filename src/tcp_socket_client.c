@@ -126,12 +126,12 @@ operation_result tcp_send_rpc_request(rpc* request){
 }
 int integerFromArrayTip(char* array){
 	int number = 0;
-	number = (int)(array[3]);
-	number = (number<<8) + array[2];
-	number = (number<<8) + array[1];
-	number = (number<<8) + array[0];
+	number = (int)((unsigned char)array[3]);
+	number = (number<<8) + (unsigned char) array[2];
+	number = (number<<8) + (unsigned char) array[1];
+	number = (number<<8) + (unsigned char) array[0];
 	printf("number:%i",number);
-	return 10;
+	return number;
 
 }
 
@@ -141,18 +141,27 @@ operation_result tcp_recv_rpc_response(rpc* response){
 	bzero(resp_buf, sizeof(resp_buf));
 	if(read(sockfd, resp_buf, sizeof(resp_buf)) > 0){
 		int size_int = integerFromArrayTip(resp_buf);
-		char* recv_payload = &resp_buf[4];
-		recv_payload[size_int]='\0';
-		printf("cadena: %s\n",recv_payload);
+		char* recv_data = &resp_buf[4];
+		recv_data[size_int]='\0';
+		printf("size_cadena:%lu,cadena: %s\n",strlen(recv_data),recv_data);
+		printf("HOLOOO");
 		
-		json_scanf(recv_payload,size_int,RPC_JSON_FMT,
+		json_scanf(recv_data,strlen(recv_data),RPC_JSON_FMT,
+		&response->command_id,
+		&response->satellite_id,
+		&response->station_id,
+		&response->payload_size,
+		&response->payload);
+		
+		printf("cid:%i,\nsatid:%i,\nstid:%i,\nsize:%i,\npay:%lu",
 		response->command_id,
 		response->satellite_id,
 		response->station_id,
 		response->payload_size,
-		response->payload);
+		strlen(response->payload));
 		
 		return socket_success;
+
 	} else {
 		return socket_failure;
 	}

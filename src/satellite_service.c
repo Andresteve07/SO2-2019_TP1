@@ -3,7 +3,7 @@
 #include "socket_client.h"
 #include "frozen.h"
 
-#define TELEMETRY_JSON_FMT "{cpu_usage:%d,firmware_version:%d,mem_usage:%d,satellite_id:%d,uptime:%d}"
+#define TELEMETRY_JSON_FMT "{cpu_usage:%f,firmware_version:%d,mem_usage:%f,satellite_id:%d,uptime:%f}"
 #define TELEMETY_COMMAND_CODE 3
 #define SCAN_COMMAND_CODE 2
 #define FIRMWARE_COMMAND_CODE 1

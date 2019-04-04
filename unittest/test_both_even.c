@@ -29,6 +29,14 @@ TEST_F(ModuloTest, easy_json_test){
 
 }
 
+TEST_F(JSONTest, qfield_json_test){
+	char* str = "{ \"a\": 123, \"b\": \"{pal\":2342}\", \"c\": false }";
+	char* b;
+	int result = json_scanf(str, strlen(str), "{b: %Q}", &b);
+	printf("result:%i, b:%s\n",result, b);
+	assert(strlen(b)==12);
+}
+
 TEST_F(ModuloTest, both_even_numbers)
 {
 	int a;
@@ -160,8 +168,9 @@ TEST_F(ModuloTest, one_odd_and_other_zero)
 
 int main(void)
 {
-	init_vista();
+	//init_vista();
 	RUN_TEST(ModuloTest, easy_json_test);
+	RUN_TEST(JSONTest, qfield_json_test);
 	RUN_TEST(ModuloTest, both_odd_numbers);
 	RUN_TEST(ModuloTest, both_even_numbers);
 	RUN_TEST(ModuloTest, first_even_and_second_odd);
