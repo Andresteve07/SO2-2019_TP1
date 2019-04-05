@@ -54,7 +54,8 @@ operation_result tcp_recv_data_bytes(char* data_buffer, size_t byte_count);
 operation_result tcp_send_rpc_request(rpc* request);
 operation_result tcp_recv_rpc_response(rpc* response);
 operation_result tcp_send_file(char* file_name);
-operation_result tcp_recv_file();
+operation_result tcp_recv_file(FILE* input_file);
+operation_result tcp_recv_file_known_size(FILE* input_file, size_t byte_count);
 operation_result tcp_close_connection();
 
 operation_result udp_connect();

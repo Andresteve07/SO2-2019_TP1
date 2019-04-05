@@ -11,7 +11,7 @@ sock.bind(server_address)
 sock.listen(1)
 
 def recv_file(connection):
-    with open('received_file', 'wb') as f:
+    with open('../assets/received_file', 'wb') as f:
         print 'file opened'
         while True:
             print('receiving data...')

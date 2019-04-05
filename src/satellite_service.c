@@ -31,7 +31,11 @@ int upgrade_firmware(char* file_name){
     tcp_send_file(FIRMWARE_FILE_PATH);
 }
 
-int earth_surface_scan();
+int earth_surface_scan(){
+    FILE* file_ptr = fopen("input_file","w");
+    tcp_send_data_bytes("sdfsdfsdfsdf0",13);
+    tcp_recv_file(file_ptr);
+}
 
 int get_telemetry_data(sat_telemetry* telemetry_data){
     rpc telemetry_request = {

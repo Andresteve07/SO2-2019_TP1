@@ -7,7 +7,7 @@ port = 12121                     # Reserve a port for your service every new tra
 s.connect((host, port))
 s.send("Hello server!")
 
-with open('received_file', 'wb') as f:
+with open('../assets/received_file', 'wb') as f:
     print 'file opened'
     while True:
         print('receiving data...')

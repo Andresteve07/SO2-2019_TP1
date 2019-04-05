@@ -215,7 +215,45 @@ operation_result tcp_send_file(char* file_name){
 	}
 	return socket_success;
 }
-operation_result tcp_recv_file(FILE* file_ptr){}
+
+int scan_input_buf_for_EOF(char* buf, int s) { 
+    int i;
+    char ch;
+    for (i = 0; i < s; i++) {
+        ch = buf[i];
+        if (ch == EOF){
+			return 1;
+		}
+    }
+    return 0;
+}
+operation_result tcp_recv_file(FILE* file_ptr){
+	log_trace("RECV FILE");
+	char input_buffer[NET_BUF_SIZE];
+	while(1){
+		bzero(input_buffer,NET_BUF_SIZE);
+		if(read(sockfd, input_buffer, sizeof(input_buffer)) <= 0){
+			log_error("Failure to read %i bytes on file transfer.",NET_BUF_SIZE);
+			fclose(file_ptr);
+			return socket_failure;
+		}
+		if(fwrite(input_buffer,1,sizeof(input_buffer),file_ptr) <= 0){
+			log_error("Failure to write %i bytes into input file.",sizeof(input_buffer));
+			fclose(file_ptr);
+			return socket_failure;
+		}
+		if(scan_input_buf_for_EOF(input_buffer, NET_BUF_SIZE)){
+			break;
+		}	
+	}
+	fclose(file_ptr);
+	log_debug("Successful file transfer.");
+	
+}
+
+operation_result tcp_recv_file_known_size(FILE* input_file, size_t byte_count){
+
+}
 
 operation_result tcp_close_connection(){
 	// close the socket 

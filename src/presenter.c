@@ -64,7 +64,7 @@ void start_firmware_update(char* upgrade_file_name){
 }
 
 void start_image_scanning(){
-
+	earth_surface_scan();
 }
 
 void request_sat_telemetry(){

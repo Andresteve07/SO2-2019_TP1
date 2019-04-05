@@ -1,6 +1,6 @@
 import socket                   # Import socket module
 
-port = 50000                    # Reserve a port for your service every new transfer wants a new port or you must wait.
+port = 12121                    # Reserve a port for your service every new transfer wants a new port or you must wait.
 s = socket.socket()             # Create a socket object
 host = ""   # Get local machine name
 s.bind((host, port))            # Bind to the port
@@ -15,7 +15,8 @@ while True:
     data = conn.recv(1024)
     print('Server received', repr(data))
 
-    filename='file_server' #In the same folder or path is this file running must the file you want to tranfser to be
+    filename='../assets/file_server' #In the same folder or path is this file running must the file you want to tranfser to be
+    #$ echo -n -e '\xff' >> file_server #This adds an EOF to the end of the file.
     #$ dd if=/dev/urandom of=file_server count=32 bs=1024
     f = open(filename,'rb')
     l = f.read(1024)
