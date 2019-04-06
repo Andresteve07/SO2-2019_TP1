@@ -46,6 +46,16 @@ TEST_F(JSONTest, qfield_json_test){
 	assert(strlen(b)==99);
 }
 
+TEST_F(JSONTest, telemetry_json_scan_test){
+	
+	char* str = "{\"cpu_usage\":73.68,\"firmware_version\":12413,\"mem_usage\":45.71,\"satellite_id\":555555,\"uptime\":98.89}";
+	char* fmt = "{cpu_usage:%f,firmware_version:%d,mem_usage:%f,satellite_id:%d,uptime:%f}";
+	float c,m,u;
+	int f,s;
+	int result = json_scanf(str, strlen(str), fmt, &c,&f,&m,&s,&u);
+	printf("result:%i, c:%f,m:%f,u:%f,f:%i,s:%i\n",result, c,m,u,f,s);
+	assert(strlen(fmt)==99);
+}
 
 TEST_F(ModuloTest, both_even_numbers)
 {
@@ -178,6 +188,7 @@ TEST_F(ModuloTest, one_odd_and_other_zero)
 
 int main(void)
 {
+	RUN_TEST(JSONTest, telemetry_json_scan_test);
 	RUN_TEST(ModuloTest, easy_json_test);
 	RUN_TEST(JSONTest, qfield_json_test);
 	RUN_TEST(JSONTest, print_qfield_json_test);

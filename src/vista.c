@@ -9,6 +9,7 @@
 #include <stdio.h>
 //#include <ncurses.h>
 #include "log.h"
+#define clear() //printf("\033[H\033[J")
 
 void init_vista(){
 	log_debug("VISTA INIT\n");
@@ -20,6 +21,7 @@ void show_login_promt(){
 	//clear();
 	//refresh();
 	//printw("holo%i",5);
+	clear();
 	char user_name_input[10];
 	char user_password[10];
 	printf("Login to operate earth station.\n");
@@ -40,6 +42,7 @@ void show_login_success_message(){
 }
 void show_command_promt(){
 	int selected_option;
+	clear();
 	printf("Select option:\n");
 	printf("1.%s\n2.%s\n3.%s\n4.%s\n",
 			"upgrade satellite firmware.",
@@ -61,4 +64,8 @@ void show_scanning_started(){
 }
 void show_telemetry_promt(){
 	printf("Telemetry request sent.\n");
+}
+
+void show_goodby_message(){
+	printf("Thank you for using SatStation.\n");
 }

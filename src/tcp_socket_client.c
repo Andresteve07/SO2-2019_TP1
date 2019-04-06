@@ -17,14 +17,16 @@
 #include <arpa/inet.h>
 #include "frozen.h"
 #include "log.h"
+#include <sys/time.h>
  
 #define PORT 12121 
 #define SA struct sockaddr 
-#define RPC_JSON_FMT "{command_id:%d,satellite_id:%d,station_id:%d,payload_size:%d,payload:%Q}"
+#define RPC_JSON_FMT "{command_id:%d,satellite_id:%d,station_id:%d,payload:%Q}"
 
 int sockfd, connfd;
 struct sockaddr_in servaddr, cli;
 char* response_buffer;
+
 
 operation_result tcp_init(){
     // socket create and varification 
@@ -34,9 +36,26 @@ operation_result tcp_init(){
         return socket_failure; 
     } 
     else {
-		log_debug("Socket successfully created..\n"); 
-		return socket_success;
+		log_debug("Socket successfully created..\n");
+		return tcp_timeouts(10);
 	}
+}
+
+operation_result tcp_timeouts(int seconds){
+	struct timeval timeout;      
+    timeout.tv_sec = seconds;
+    timeout.tv_usec = 0;
+
+    if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0){
+		log_error("setsockopt failed\n");
+		return socket_failure;
+	}
+        
+    if (setsockopt (sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(timeout)) < 0){
+		log_error("setsockopt failed\n");
+		return socket_failure;
+	}
+        
 }
 
 operation_result tcp_connect_to_server(char*  server_ip){
@@ -110,7 +129,6 @@ operation_result tcp_send_rpc_request(rpc* request){
 	request->command_id,
 	request->satellite_id,
 	request->station_id,
-	request->payload_size,
 	request->payload);
 	log_trace("RPC req: %s\n",rpc_buf);
 
@@ -151,16 +169,14 @@ operation_result tcp_recv_rpc_response(rpc* response){
 		& response->command_id,
 		& response->satellite_id,
 		& response->station_id,
-		& response->payload_size,
 		& response->payload);
 
 		log_trace("payload size: %lu, apy:%s", strlen(response->payload),response->payload);
 		
-		log_trace("cid:%i,\nsatid:%i,\nstid:%i,\nsize:%lu,\npay:%s",
+		log_trace("cid:%i,\nsatid:%i,\nstid:%i,\npay:%s",
 		response->command_id,
 		response->satellite_id,
 		response->station_id,
-		response->payload_size,
 		response->payload);
 		
 		return socket_success;
@@ -222,6 +238,9 @@ int scan_input_buf_for_EOF(char* buf, int s) {
     for (i = 0; i < s; i++) {
         ch = buf[i];
         if (ch == EOF){
+			if (i+1 < strlen(buf)) {
+				buf[i+1] = '\0';
+			}
 			return 1;
 		}
     }
@@ -232,7 +251,7 @@ operation_result tcp_recv_file(FILE* file_ptr){
 	char input_buffer[NET_BUF_SIZE];
 	while(1){
 		bzero(input_buffer,NET_BUF_SIZE);
-		if(read(sockfd, input_buffer, sizeof(input_buffer)) <= 0){
+		if(read(sockfd, input_buffer, NET_BUF_SIZE) <= 0){
 			log_error("Failure to read %i bytes on file transfer.",NET_BUF_SIZE);
 			fclose(file_ptr);
 			return socket_failure;
@@ -247,8 +266,7 @@ operation_result tcp_recv_file(FILE* file_ptr){
 		}	
 	}
 	fclose(file_ptr);
-	log_debug("Successful file transfer.");
-	
+	log_debug("Successful file transfer.");	
 }
 
 operation_result tcp_recv_file_known_size(FILE* input_file, size_t byte_count){

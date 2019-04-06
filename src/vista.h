@@ -16,5 +16,6 @@ void show_command_promt();
 void show_firmware_update_prompt();
 void show_scanning_started();
 void show_telemetry_promt();
+void show_goodby_message();
 
 #endif /* SRC_VISTA_H_ */

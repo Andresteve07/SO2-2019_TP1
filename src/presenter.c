@@ -54,9 +54,14 @@ void process_option_selection(int selected_option){
 			request_sat_telemetry();
 			show_telemetry_promt();
 			break;
+		case 4:
+			show_goodby_message();
+			exit(0);
+			break;
 		default:
 			break;
 	}
+	show_command_promt();
 }
 
 void start_firmware_update(char* upgrade_file_name){
@@ -71,5 +76,4 @@ void request_sat_telemetry(){
 	sat_telemetry telemetry_data;
 	malloc(sizeof(sat_telemetry));
 	get_telemetry_data(&telemetry_data);
-	log_trace("mem:%i,cpu:%i",telemetry_data.mem_usage,telemetry_data.cpu_usage);
 }

@@ -41,11 +41,11 @@ typedef struct rpc
 	unsigned char command_id;
 	int satellite_id;
 	int station_id;
-	size_t payload_size;
 	char* payload;
 } rpc;
 
 operation_result tcp_init();
+operation_result tcp_timeouts(int seconds);
 operation_result tcp_connect_to_server(char*  server_ip);
 operation_result tcp_send_data(char* data_buffer);
 operation_result tcp_send_data_bytes(char* data_buffer, size_t byte_count);
