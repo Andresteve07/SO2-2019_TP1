@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "satellite_service.h"
-#include "socket_client.h"
+#include "shared/socket_operation.h"
 #include "frozen.h"
 #include "log.h"
 #include "string.h"
@@ -21,9 +21,9 @@
 #define FIRMWARE_FILE_PATH "../assets/file_server"
 
 int init_sat_service(){
-    tcp_init();
+    tcp_init_client();
     tcp_connect_to_server("sad");
-    udp_init();
+    udp_init_client();
     return 0;
 }
 

@@ -5,7 +5,7 @@
  *      Author: steve-urbit
  */
 
-#include "socket_client.h"
+#include "socket_operation.h"
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <unistd.h> 
@@ -21,22 +21,22 @@
 #define PORT	12121 
 #define MAXLINE 1024 
 
-int sockfd;
-struct sockaddr_in servaddr;
+int udp_sockfd;
+struct sockaddr_in udp_servaddr;
 
-operation_result udp_init(){
+operation_result udp_init_client(){
 	// Creating socket file descriptor 
-	if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+	if ( (udp_sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
 		log_error("socket creation failed"); 
 		exit(EXIT_FAILURE); 
 	} 
 
-	memset(&servaddr, 0, sizeof(servaddr)); 
+	memset(&udp_servaddr, 0, sizeof(udp_servaddr)); 
 	
 	// Filling server information 
-	servaddr.sin_family = AF_INET; 
-	servaddr.sin_port = htons(PORT); 
-	servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	udp_servaddr.sin_family = AF_INET; 
+	udp_servaddr.sin_port = htons(PORT); 
+	udp_servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	log_debug("UDP socket creation succeed!");
 	return socket_success;
 }
@@ -79,9 +79,9 @@ operation_result udp_send_rpc_request(rpc* request){
 	
 	log_trace("TOTAL req: %c%c%c%c%s\n",total_buf[0],total_buf[1],total_buf[2],total_buf[3],&total_buf[4]);
 
-	if(sendto(sockfd, total_buf, strlen(rpc_buf)+4, 
-	MSG_CONFIRM, (const struct sockaddr *) & servaddr, 
-	sizeof(servaddr)) > 0){
+	if(sendto(udp_sockfd, total_buf, strlen(rpc_buf)+4, 
+	MSG_CONFIRM, (const struct sockaddr *) & udp_servaddr, 
+	sizeof(udp_servaddr)) > 0){
 		return socket_success;
 	} else {
 		return socket_failure;
@@ -94,8 +94,8 @@ operation_result udp_recv_rpc_response(rpc* response){
 	bzero(resp_buf, sizeof(resp_buf));
 	socklen_t address_size; 
 	
-	if(recvfrom(sockfd, resp_buf, sizeof(resp_buf),
-	MSG_WAITALL, (struct sockaddr *) &servaddr, 
+	if(recvfrom(udp_sockfd, resp_buf, sizeof(resp_buf),
+	MSG_WAITALL, (struct sockaddr *) &udp_servaddr, 
 	&address_size) > 0){
 		int size_int = integerFromArrayTip(resp_buf);
 		char* recv_data = &resp_buf[4];

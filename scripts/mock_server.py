@@ -42,7 +42,8 @@ def telemetry_mock(connection):
             data = '\xC6\x00\x00\x00{"command_id":3,"satellite_id":555555,"station_id":999999,"payload_size":99,"payload":"{\\"cpu_usage\\":73.68,\\"firmware_version\\":12413,\\"mem_usage\\":45.71,\\"satellite_id\\":555555,\\"uptime\\":98.89}"}'
             connection.sendall(data)
 def firmware_upgrade(connection):
-    data = connection.recv(1024)
+    print 'HOLO'
+    data = connection.recv(35)
     print >>sys.stderr, 'received "%s"' % data
     if data:
         data = '\x63\x00\x00\x00{"command_id":1,"satellite_id":555555,"station_id":999999,"payload":"{\\"current_version\\":11235}"}'

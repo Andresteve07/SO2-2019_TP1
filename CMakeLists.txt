@@ -23,8 +23,8 @@ src/frozen.c
 src/presenter.c 
 src/vista.c
 src/login_service.c
-src/tcp_socket_client.c
-src/udp_socket_client.c
+src/shared/tcp_socket_operations.c
+src/shared/udp_socket_operations.c
 src/satellite_service.c
 src/log.c)
 

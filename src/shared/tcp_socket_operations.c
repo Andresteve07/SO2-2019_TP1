@@ -4,7 +4,7 @@
  *  Created on: 1 abr. 2019
  *      Author: steve-urbit
  */
-#include "socket_client.h"
+#include "socket_operation.h"
 #include <netdb.h> 
 #include <stdio.h> 
 #include <stdlib.h> 
@@ -22,15 +22,15 @@
 #define PORT 12121 
 #define SA struct sockaddr
 
-int sockfd, connfd;
-struct sockaddr_in servaddr, cli;
+int tcp_sockfd, connfd;
+struct sockaddr_in tcp_servaddr, cli;
 char* response_buffer;
 
 
-operation_result tcp_init(){
+operation_result tcp_init_client(){
     // socket create and varification 
-    sockfd = socket(AF_INET, SOCK_STREAM, 0); 
-	if (sockfd == -1) { 
+    tcp_sockfd = socket(AF_INET, SOCK_STREAM, 0); 
+	if (tcp_sockfd == -1) { 
         log_error("socket creation failed...\n"); 
         return socket_failure; 
     } 
@@ -45,12 +45,12 @@ operation_result tcp_timeouts(int seconds){
     timeout.tv_sec = seconds;
     timeout.tv_usec = 0;
 
-    if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0){
+    if (setsockopt (tcp_sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0){
 		log_error("setsockopt failed\n");
 		return socket_failure;
 	}
         
-    if (setsockopt (sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(timeout)) < 0){
+    if (setsockopt (tcp_sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(timeout)) < 0){
 		log_error("setsockopt failed\n");
 		return socket_failure;
 	}
@@ -58,14 +58,14 @@ operation_result tcp_timeouts(int seconds){
 }
 
 operation_result tcp_connect_to_server(char*  server_ip){
-	bzero(&servaddr, sizeof(servaddr)); 
+	bzero(&tcp_servaddr, sizeof(tcp_servaddr)); 
 	// assign IP, PORT 
-    servaddr.sin_family = AF_INET; 
-    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
-    servaddr.sin_port = htons(PORT); 
+    tcp_servaddr.sin_family = AF_INET; 
+    tcp_servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
+    tcp_servaddr.sin_port = htons(PORT); 
   
     // connect the client socket to server socket 
-    if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) { 
+    if (connect(tcp_sockfd, (SA*)&tcp_servaddr, sizeof(tcp_servaddr)) != 0) { 
         log_error("connection with the server failed...\n"); 
         return socket_failure; 
     } else {
@@ -75,7 +75,7 @@ operation_result tcp_connect_to_server(char*  server_ip){
 }
 
 operation_result tcp_send_data(char* data_buffer){
-	if(write(sockfd, data_buffer, sizeof(data_buffer)) > 0){
+	if(write(tcp_sockfd, data_buffer, sizeof(data_buffer)) > 0){
 		return socket_success;
 	} else {
 		return socket_failure;
@@ -83,7 +83,7 @@ operation_result tcp_send_data(char* data_buffer){
 }
 
 operation_result tcp_send_data_bytes(char* data_buffer, size_t byte_count){
-	if(write(sockfd, data_buffer, byte_count) > 0){
+	if(write(tcp_sockfd, data_buffer, byte_count) > 0){
 		return socket_success;
 	} else {
 		return socket_failure;
@@ -91,7 +91,7 @@ operation_result tcp_send_data_bytes(char* data_buffer, size_t byte_count){
 }
 
 operation_result tcp_recv_data_bytes(char* data_buffer, size_t byte_count){
-	if(read(sockfd, data_buffer, byte_count) > 0){
+	if(read(tcp_sockfd, data_buffer, byte_count) > 0){
 	return socket_success;
 	} else {
 		return socket_failure;
@@ -99,7 +99,7 @@ operation_result tcp_recv_data_bytes(char* data_buffer, size_t byte_count){
 }
 
 operation_result tcp_recv_data(char* data_buffer){
-	if(read(sockfd, data_buffer, sizeof(data_buffer)) > 0){
+	if(read(tcp_sockfd, data_buffer, sizeof(data_buffer)) > 0){
 	return socket_success;
 	} else {
 		return socket_failure;
@@ -134,7 +134,7 @@ operation_result tcp_send_rpc_request(rpc* request){
 	
 	log_trace("TOTAL req: %c%c%c%c%s\n",total_buf[0],total_buf[1],total_buf[2],total_buf[3],&total_buf[4]);
 
-	if(write(sockfd, total_buf, strlen(rpc_buf)+4) > 0){
+	if(write(tcp_sockfd, total_buf, strlen(rpc_buf)+4) > 0){
 		return socket_success;
 	} else {
 		return socket_failure;
@@ -156,7 +156,7 @@ operation_result tcp_recv_rpc_response(rpc* response){
 	size_t payload_size;
 	char resp_buf[500];//sizeof only works ok for static arrays i.e. results on 500
 	bzero(resp_buf, sizeof(resp_buf));
-	if(read(sockfd, resp_buf, sizeof(resp_buf)) > 0){
+	if(read(tcp_sockfd, resp_buf, sizeof(resp_buf)) > 0){
 		int size_int = integerFromArrayTip(resp_buf);
 		char* recv_data = &resp_buf[4];
 		recv_data[size_int]='\0';
@@ -212,14 +212,14 @@ operation_result tcp_send_file(char* file_name){
 	while (1) {
 		// process 
 		if (load_file_buffer(file_ptr, file_buffer, NET_BUF_SIZE)) {
-			if(write(sockfd, file_buffer, strlen(file_buffer)) > 0){
+			if(write(tcp_sockfd, file_buffer, strlen(file_buffer)) > 0){
 				break;
 			} else {
 				return socket_failure;
 			}
 		}
 		// send 
-		if(write(sockfd, file_buffer, NET_BUF_SIZE) <= 0){
+		if(write(tcp_sockfd, file_buffer, NET_BUF_SIZE) <= 0){
 			return socket_failure;
 		}
 		bzero(file_buffer,NET_BUF_SIZE);
@@ -249,7 +249,7 @@ operation_result tcp_recv_file(FILE* file_ptr){
 	char input_buffer[NET_BUF_SIZE];
 	while(1){
 		bzero(input_buffer,NET_BUF_SIZE);
-		if(read(sockfd, input_buffer, NET_BUF_SIZE) <= 0){
+		if(read(tcp_sockfd, input_buffer, NET_BUF_SIZE) <= 0){
 			log_error("Failure to read %i bytes on file transfer.",NET_BUF_SIZE);
 			fclose(file_ptr);
 			return socket_failure;
@@ -274,6 +274,6 @@ operation_result tcp_recv_file_known_size(FILE* input_file, size_t byte_count){
 
 operation_result tcp_close_connection(){
 	// close the socket 
-    close(sockfd);
+    close(tcp_sockfd);
 	return socket_success;
 }

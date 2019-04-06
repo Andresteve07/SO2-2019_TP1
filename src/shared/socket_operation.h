@@ -23,20 +23,6 @@ typedef enum{
 	socket_unknown
 }operation_result;
 
-typedef enum{
-	TCP,
-	UDP,
-	OTHER
-}connection_type;
-/*
-typedef struct rpc_request
-{
-	unsigned char command_id;
-	int satellite_id;
-	int station_id;
-	size_t payload_size;
-} rpc_request;
-*/
 typedef struct rpc
 {
 	unsigned char command_id;
@@ -45,7 +31,8 @@ typedef struct rpc
 	char* payload;
 } rpc;
 
-operation_result tcp_init();
+operation_result tcp_init_client();
+operation_result tcp_init_server();
 operation_result tcp_timeouts(int seconds);
 operation_result tcp_connect_to_server(char*  server_ip);
 operation_result tcp_send_data(char* data_buffer);
@@ -64,7 +51,8 @@ void load_heading_integer_to_byte_array(int number,char* array);
 
 operation_result udp_connect();
 
-operation_result udp_init();
+operation_result udp_init_client();
+operation_result udp_init_server();
 operation_result udp_timeouts(int seconds);
 operation_result udp_connect_to_server(char*  server_ip);
 operation_result udp_send_data();
