@@ -23,6 +23,8 @@
 int init_sat_service(){
     tcp_init();
     tcp_connect_to_server("sad");
+    udp_init();
+    return 0;
 }
 
 int upgrade_firmware(char* file_name){
@@ -72,6 +74,7 @@ int earth_surface_scan(){
         FILE* file_ptr = fopen(filename,"w");
         tcp_recv_file(file_ptr);
     }
+    return 0;
 }
 
 int get_telemetry_data(sat_telemetry* telemetry_data){
@@ -81,8 +84,8 @@ int get_telemetry_data(sat_telemetry* telemetry_data){
         SATELLITE_ID,
         NULL};
     rpc telemetry_response;
-    tcp_send_rpc_request(&telemetry_request);
-    tcp_recv_rpc_response(&telemetry_response);
+    udp_send_rpc_request(&telemetry_request);
+    udp_recv_rpc_response(&telemetry_response);
     
     int result = json_scanf(telemetry_response.payload, strlen(telemetry_response.payload),
     TELEMETRY_JSON_FMT,

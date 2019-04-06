@@ -20,8 +20,7 @@
 #include <sys/time.h>
  
 #define PORT 12121 
-#define SA struct sockaddr 
-#define RPC_JSON_FMT "{command_id:%d,satellite_id:%d,station_id:%d,payload:%Q}"
+#define SA struct sockaddr
 
 int sockfd, connfd;
 struct sockaddr_in servaddr, cli;
@@ -55,7 +54,7 @@ operation_result tcp_timeouts(int seconds){
 		log_error("setsockopt failed\n");
 		return socket_failure;
 	}
-        
+    return socket_success;
 }
 
 operation_result tcp_connect_to_server(char*  server_ip){
@@ -115,7 +114,6 @@ void load_heading_integer_to_byte_array(int number,char* array){
 	array[2] = (unsigned char) ((number>>16) & 0xFF);
 	array[3] = (unsigned char) ((number>>24) & 0xFF);
 	log_trace("bytes:%i,%i,%i,%i\n",array[0],array[1],array[2],array[3]);
-
 }
 
 operation_result tcp_send_rpc_request(rpc* request){
@@ -266,11 +264,12 @@ operation_result tcp_recv_file(FILE* file_ptr){
 		}	
 	}
 	fclose(file_ptr);
-	log_debug("Successful file transfer.");	
+	log_debug("Successful file transfer.");
+	return socket_success;
 }
 
 operation_result tcp_recv_file_known_size(FILE* input_file, size_t byte_count){
-
+	return socket_success;
 }
 
 operation_result tcp_close_connection(){

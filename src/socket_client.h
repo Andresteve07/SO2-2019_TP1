@@ -14,7 +14,8 @@
 #ifndef SRC_SOCKET_CLIENT_H_
 #define SRC_SOCKET_CLIENT_H_
 
-#include<stdio.h> 
+#include<stdio.h>
+#define RPC_JSON_FMT "{command_id:%d,satellite_id:%d,station_id:%d,payload:%Q}"
 
 typedef enum{
 	socket_success,
@@ -58,9 +59,18 @@ operation_result tcp_recv_file(FILE* input_file);
 operation_result tcp_recv_file_known_size(FILE* input_file, size_t byte_count);
 operation_result tcp_close_connection();
 
+int integerFromArrayTip(char* array);
+void load_heading_integer_to_byte_array(int number,char* array);
+
 operation_result udp_connect();
+
+operation_result udp_init();
+operation_result udp_timeouts(int seconds);
+operation_result udp_connect_to_server(char*  server_ip);
 operation_result udp_send_data();
 operation_result udp_recv_data();
+operation_result udp_send_rpc_request(rpc* request);
+operation_result udp_recv_rpc_response(rpc* response);
 
 
 #endif /* SRC_SOCKET_CLIENT_H_ */
