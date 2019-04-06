@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "satellite_service.h"
-#include "socket_client.h"
+#include "shared/socket_client.h"
 #include "frozen.h"
 #include "log.h"
 #include "string.h"
