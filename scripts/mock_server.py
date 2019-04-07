@@ -1,5 +1,6 @@
 import socket
 import sys
+import time
 
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -69,7 +70,11 @@ def image_scanner(connection):
         data = '\x7A\x00\x00\x00{"command_id":2,"satellite_id":555555,"station_id":999999,"payload":"{\\"slice_quantity\\":3,\\"slice_size_bytes\\":256}"}'
         connection.sendall(data)
     send_file(connection)
-        
+def timeout_test(connection):
+    print 'Waiting Start'
+    time.sleep(20)
+    print 'Waiting Finished'
+    
 while True:
     # Wait for a connection
     print >>sys.stderr, 'waiting for a connection'
@@ -85,7 +90,7 @@ while True:
 
         #image_scanner(connection)
 
-        #telemetry_mock(connection)
+        #timeout_test(connection)
             
     finally:
         # Clean up the connection
