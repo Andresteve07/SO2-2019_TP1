@@ -65,15 +65,33 @@ void process_option_selection(int selected_option){
 }
 
 void start_firmware_update(char* upgrade_file_name){
-	upgrade_firmware("sadas");
+	if(upgrade_firmware("sadas")==0){
+		show_upgrade_success();
+	} else {
+		show_upgrade_failure();
+	}
 }
 
 void start_image_scanning(){
-	earth_surface_scan();
+	if(earth_surface_scan()==0){
+		show_scan_success_message();
+	} else {
+		show_scan_failure_message();
+	}
 }
 
 void request_sat_telemetry(){
 	sat_telemetry telemetry_data;
-	malloc(sizeof(sat_telemetry));
-	get_telemetry_data(&telemetry_data);
+	//malloc(sizeof(sat_telemetry));
+	//("cpu_usage:%f,firmware_version:%i,mem_usage:%f,satellite_id:%i,uptime:%f",
+        
+	if(get_telemetry_data(&telemetry_data)==0){
+		show_telemetry_data(telemetry_data.cpu_usage,
+        telemetry_data.firm_version,
+        telemetry_data.mem_usage,
+        telemetry_data.satellite_id,
+        telemetry_data.uptime);
+	} else {
+		show_telemetry_failure();
+	}
 }

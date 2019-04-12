@@ -55,15 +55,36 @@ void show_command_promt(){
 
 void show_firmware_update_prompt(){
 	char upgrade_file_name[20];
-	printf("Binary file name:  ");
-	scanf("%s",upgrade_file_name);
+	printf("Starting Firmware Upgrade with binary file: assets/so2_tp1-sat\n");
+	//scanf("%s",upgrade_file_name);
 	start_firmware_update(upgrade_file_name);
+}
+void show_upgrade_success(){
+	printf("Upgrade file transfer succeed!\n");
+}
+void show_upgrade_failure(){
+	printf("Upgrade file transfer failure, please try again.\n");
 }
 void show_scanning_started(){
 	printf("Earth Scan Started.\n");
 }
+void show_scan_success_message(){
+	printf("All scan slices where download successfully.\n");
+}
+void show_scan_failure_message(){
+	printf("An error ocurred while downloading scan slices.\n");
+}
+
 void show_telemetry_promt(){
 	printf("Telemetry request sent.\n");
+}
+
+void show_telemetry_data(float cpu_usage,int firm_version,float mem_usage,int satellite_id,float uptime){
+	printf("Telemetry Results: \ncpu_usage:%f,\nfirmware_version:%i,\nmem_usage:%f,\nsatellite_id:%i,\nuptime:%f\n",
+	cpu_usage,firm_version,mem_usage,satellite_id,uptime);
+}
+void show_telemetry_failure(){
+	printf("Telemetry request failed.\n");
 }
 
 void show_goodby_message(){

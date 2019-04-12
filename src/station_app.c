@@ -4,6 +4,6 @@
 int main(void)
 {
 	log_set_level(LOG_TRACE);
-	log_set_quiet(0);
+	log_set_quiet(1);
 	init_vista();
 }
