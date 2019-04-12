@@ -16,6 +16,6 @@ while True:
     print >>sys.stderr, data
     
     if data:
-        data = '\xC6\x00\x00\x00{"command_id":3,"satellite_id":555555,"station_id":999999,"payload_size":99,"payload":"{\\"cpu_usage\\":73.68,\\"firmware_version\\":12413,\\"mem_usage\\":45.71,\\"satellite_id\\":555555,\\"uptime\\":98.89}"}'
+        data = '\xD3\x00\x00\x00{"command_id":3,"satellite_id":555555,"station_id":999999,"payload_size":99,"error":null,"payload":"{\\"cpu_usage\\":73.68,\\"firmware_version\\":12413,\\"mem_usage\\":45.71,\\"satellite_id\\":555555,\\"uptime\\":98.89}"}'
         sent = sock.sendto(data, address)
         print >>sys.stderr, 'sent %s bytes back to %s' % (sent, address)

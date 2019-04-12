@@ -14,7 +14,8 @@ add_definitions(-DLOG_USE_COLOR)
 add_executable(run_test 
 unittest/test_both_even.c 
 src/both.c 
-src/frozen.c 
+src/frozen.c
+src/log.c
 )
 
 add_executable(so2_tp1_station 
