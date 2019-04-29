@@ -1,6 +1,5 @@
 build/
 .vscode/
-assets/scans/
 
 .vscode/*
 !.vscode/settings.json

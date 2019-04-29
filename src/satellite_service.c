@@ -28,8 +28,8 @@
 
 int init_sat_service(){
     tcp_init_client();
-    tcp_connect_to_server("sad");
-    udp_init_client();
+    tcp_connect_to_server("127.0.0.1");
+    udp_init_client("127.0.0.1");
     return 0;
 }
 
@@ -139,10 +139,15 @@ int earth_surface_scan(){
             sprintf(filename,"../assets/scans/%s",slices_dataset_array[i].slice_name);
             log_trace("FILENAME: %s",filename);
             FILE* file_ptr = fopen(filename,"wb");
-            if(tcp_recv_file_known_size(file_ptr,slices_dataset_array[i].slice_size_bytes)==socket_success){
-                log_debug("File: %s SUCCESSFULLY RECEIVED!", filename);
-            } else {
-                log_error("File: %s COULD NOT BE RECEIVED!", filename);
+            if (file_ptr != NULL){
+                if(tcp_recv_file_known_size(file_ptr,slices_dataset_array[i].slice_size_bytes)==socket_success){
+                    log_debug("File: %s SUCCESSFULLY RECEIVED!", filename);
+                } else {
+                    log_error("File: %s COULD NOT BE RECEIVED!", filename);
+                    return 1;
+                }    
+            } else{
+                log_error("Failed to create file: %s",filename);
                 return 1;
             }
         }    
