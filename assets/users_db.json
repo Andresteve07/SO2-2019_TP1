@@ -1,0 +1,8 @@
+{
+    "users":[
+        {"user_name":"qwe","password":"123"},
+        {"user_name":"asd","password":"987"},
+        {"user_name":"steve","password":"666"},
+        {"user_name":"elon","password":"1948"}
+    ]
+}

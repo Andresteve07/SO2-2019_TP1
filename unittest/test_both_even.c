@@ -8,6 +8,7 @@
 #include "frozen.h"
 #include "satellite_service.h"
 #include "log.h"
+#include <regex.h>
 
 DEFINE_FFF_GLOBALS
 #define TEST_F(SUITE, NAME) void NAME()
@@ -20,6 +21,53 @@ void setup()
 	RESET_FAKE(modulo);
 }
 
+TEST_F(JSONTest, regex_test){
+	regex_t regex;
+int reti;
+char msgbuf[100];
+
+/* Compile regular expression */
+reti = regcomp(&regex, "[[:alnum:]{3}]", 0);
+if (reti) {
+    fprintf(stderr, "Could not compile regex\n");
+    exit(1);
+}
+
+/* Execute regular expression */
+reti = regexec(&regex, "abc", 0, NULL, 0);
+if (!reti) {
+    puts("Match");
+}
+else if (reti == REG_NOMATCH) {
+    puts("No match");
+}
+else {
+    regerror(reti, &regex, msgbuf, sizeof(msgbuf));
+    fprintf(stderr, "Regex match failed: %s\n", msgbuf);
+    exit(1);
+}
+
+/* Free memory allocated to the pattern buffer by regcomp() */
+regfree(&regex);
+}
+
+TEST_F(JSONTest, json_file_search_test){
+	char* users_json;
+	
+	users_json = json_fread("../assets/users_db.json");
+
+	int i, len = strlen(users_json);
+	log_trace("JSON: %s",users_json);
+	char* obj_user_name;
+	char* obj_password;
+  	struct json_token t;
+	
+	for (i = 0; json_scanf_array_elem(users_json, len, ".users", i, &t) > 0; i++) {
+		// t.type == JSON_TYPE_OBJECT
+		json_scanf(t.ptr, t.len, "{user_name: %Q,password: %Q}", &obj_user_name, &obj_password);
+		log_trace("NAME: %s, PASS: %s",obj_user_name,obj_password);
+	}
+}
 TEST_F(ModuloTest, easy_json_test){
 	char* str = "{ \"a\": 123, \"b\": \"hi\", \"c\": false }";
 	int value = 0;
@@ -281,6 +329,8 @@ int main(void)
 	log_set_level(LOG_TRACE);
 	log_set_quiet(0);
 
+	RUN_TEST(JSONTest, regex_test);
+	RUN_TEST(JSON_Test, json_file_search_test);
 	RUN_TEST(JSONTest, json_scan_slices_test_bis);
 	RUN_TEST(JSONTest, telemetry_json_scan_test);
 	RUN_TEST(ModuloTest, easy_json_test);
