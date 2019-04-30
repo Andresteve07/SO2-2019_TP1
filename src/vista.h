@@ -8,7 +8,8 @@
 #ifndef SRC_VISTA_H_
 #define SRC_VISTA_H_
 
-void init_vista();
+void init_vista(char* program_params[], int params_count);
+void show_program_help(char* program_name);
 void show_login_promt();
 void show_login_failure_message(int tryCount);
 void show_login_success_message();

@@ -11,10 +11,14 @@
 #include "log.h"
 #define clear() //printf("\033[H\033[J")
 
-void init_vista(){
+void init_vista(char* program_params[], int params_count){
 	log_debug("VISTA INIT\n");
 	//initscr();
-	init_presenter();
+	init_presenter(program_params, params_count);
+}
+
+void show_program_help(char* program_name){
+	fprintf( stderr, "Uso: $ %s hostname/ip_address\n", program_name );
 }
 
 void show_login_promt(){

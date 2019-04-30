@@ -14,9 +14,14 @@
 #include <stdlib.h>
 #include "log.h"
 
-void init_presenter(){
+void init_presenter(char* program_params[], int params_count){
 	log_debug("PRESENTER INIT\n");
-	init_sat_service();
+	if (params_count < 2) {
+		show_program_help(program_params[0]);
+		log_error("Program params missing.");
+		exit(0);
+	}
+	init_sat_service(program_params[1]);
 	show_login_promt();
 }
 

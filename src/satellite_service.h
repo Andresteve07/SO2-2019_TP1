@@ -64,7 +64,7 @@ typedef struct scan_response
 } scan_response;
 
 
-int init_sat_service();
+int init_sat_service(char* server_address);
 int upgrade_firmware(char* file_name);
 int earth_surface_scan();
 int get_telemetry_data(sat_telemetry* telemetry_data);

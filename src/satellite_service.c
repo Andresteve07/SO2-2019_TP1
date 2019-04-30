@@ -26,10 +26,10 @@
 
 #define FIRMWARE_FILE_PATH "../assets/so2_tp1-sat"
 
-int init_sat_service(){
+int init_sat_service(char* server_address){
     tcp_init_client();
-    tcp_connect_to_server("127.0.0.1");
-    udp_init_client("127.0.0.1");
+    tcp_connect_to_server(server_address);
+    udp_init_client(server_address);
     return 0;
 }
 
