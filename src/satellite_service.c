@@ -49,10 +49,12 @@ int process_rpc_error(char* error_data){
 }
 
 int get_update_version(){
+    //TODO get version from file name using regex.
     return 10512;
 }
 
 long get_update_file_size(){
+    //TODO get size from upgrade file.
     return 1024;
 }
 
@@ -88,6 +90,7 @@ int upgrade_firmware(char* file_name){
     tcp_send_file(FIRMWARE_FILE_PATH);
     return 0;
 }
+
 slice_meta slices_dataset_array[500];
 void scan_slices_dataset(const char* str_json, slice_meta* result_data_set){
     char* slice_name;
