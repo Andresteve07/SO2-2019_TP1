@@ -11,11 +11,18 @@ typedef struct update_params{
 	int update_version;
 	//char* file_name;
 	long file_size_bytes;
+	char* file_path;
 } update_params;
 
 typedef struct update_result{
 	int current_version;
 } update_result;
+
+typedef struct scan_metadata{
+	char* file_name;
+	long file_size_bytes;
+} scan_metadata;
+
 /*
 typedef struct scan_params{
 	int update_version;
